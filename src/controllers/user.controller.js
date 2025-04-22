@@ -18,7 +18,6 @@ const generateAccessAndRefreshTokens = async (user) => {
 export const registerUser = asyncHandler(async (req, res) => {
   const { email, fullName, username, password, role } = req.body;
 
-  // validation - not empty
   if (
     [fullName, email, username, password, role].some(
       (field) => field?.trim() === ""
@@ -27,7 +26,6 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
-  // check if user already exists - email or username
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -35,7 +33,6 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with this email or username already exists");
   }
 
-  // create user object - in db
   const user = await User.create({
     fullName,
     email,
@@ -44,13 +41,11 @@ export const registerUser = asyncHandler(async (req, res) => {
     role
   });
 
-// check if user created in db and remove password from response
 const createdUser = await User.findById(user._id).select("-password");
 if (!createdUser) {
   throw new ApiError(500, "Something went wrong while registering the user");
 }
 
-// return response
 return res
   .status(201)
   .json(
@@ -64,10 +59,9 @@ return res
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-  // get data from req body
+
   const { email, username, password } = req.body;
 
-  // login by either username or login -> find the user
   if (!username && !email) {
     throw new ApiError(400, "Username or email is required");
   }
@@ -80,14 +74,12 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User does not exist");
   }
 
-  // password check
   const isValidPassword = await user.isPasswordCorrect(password);
 
   if (!isValidPassword) {
     throw new ApiError(401, "Invalid user credentials");
   }
 
-  // generate refresh and acces token
   const { accessToken } = await generateAccessAndRefreshTokens(user);
 
   return res.status(200).json(

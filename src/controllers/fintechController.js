@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js';
 import { Transaction } from '../models/Transaction.js';
 
-// GET /api/balance
+
 export const getBalance = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('balance');
@@ -14,7 +14,6 @@ export const getBalance = async (req, res) => {
   }
 };
 
-// POST /api/transfer
 export const transferFunds = async (req, res) => {
   const { sourceId, destinationId, amount } = req.body;
 
@@ -61,7 +60,6 @@ export const transferFunds = async (req, res) => {
   }
 };
 
-// GET /api/transactions?page=&pageSize=
 export const getTransactions = async (req, res) => {
   const { page = 1, pageSize = 10 } = req.query;
   const skip = (page - 1) * pageSize;
@@ -86,7 +84,6 @@ export const getTransactions = async (req, res) => {
   }
 };
 
-// GET /api/invoice?start=&end=
 export const generateInvoice = async (req, res) => {
   const { start, end } = req.query;
 
