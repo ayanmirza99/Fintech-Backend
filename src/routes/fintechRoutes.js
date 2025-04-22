@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { verifyJwt } from "../middlewares/auth.middleware.js";
+
 import {
     getBalance,
     transferFunds,
@@ -8,7 +9,6 @@ import {
   } from '../controllers/fintechController.js';
   
 const router = Router();
-
 
 
 
