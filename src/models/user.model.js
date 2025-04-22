@@ -30,17 +30,23 @@ const userSchema = new Schema(
       default: "DEVELOPER",
       required: true,
     },
-    // stripeCustomerId: {
-    //   type: String,
-    //   required: function () {
-    //     return this.role === "DEVELOPER";
-    //   },
-    // },
-    // subscription: {
-    //   packageName: { type: String },
-    //   status: { type: String },
-    //   currentPeriodEnd: { type: Date },
-    // },
+  
+
+    subscription: {
+      packageName: {
+        type: String,
+        default: null,
+      },
+      status: {
+        type: String,
+        enum: ['active', 'inactive', 'canceled'],
+        default: 'inactive',
+      },
+      currentPeriodEnd: {
+        type: String,
+        default: null,
+      },
+    },
     password: {
       type: String,
       required: [true, "Password is required"],

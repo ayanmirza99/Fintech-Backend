@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser,getCurrentUser } from "../controllers/user.controller.js";
+import { loginUser, registerUser,getCurrentUser,createOrUpdateSubscription } from "../controllers/user.controller.js";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
 
 
@@ -10,5 +10,6 @@ router.route("/login").post(loginUser);
 
 
 router.get("/me", verifyJwt, getCurrentUser);
+router.post('/subscription', verifyJwt,createOrUpdateSubscription);
 
 export default router;
