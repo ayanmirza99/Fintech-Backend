@@ -41,27 +41,26 @@ export const registerUser = asyncHandler(async (req, res) => {
     email,
     username,
     password,
-    role,
+    role
   });
 
-  // check if user created in db and remove password from response
-  const createdUser = await User.findById(user._id).select("-password");
-  if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user");
-  }
+// check if user created in db and remove password from response
+const createdUser = await User.findById(user._id).select("-password");
+if (!createdUser) {
+  throw new ApiError(500, "Something went wrong while registering the user");
+}
 
-  // return response
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(
-        200,
-        createdUser,
-        `${
-          user.role === "ADMIN" ? "Admin" : "Developer"
-        } registered successfully`
-      )
-    );
+// return response
+return res
+  .status(201)
+  .json(
+    new ApiResponse(
+      200,
+      createdUser,
+      `${user.role === "ADMIN" ? "Admin" : "Developer"
+      } registered successfully`
+    )
+  );
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
@@ -110,3 +109,80 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
+
+
+
+// export const getSubscriptionDetails = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.userId).select('subscription');
+
+//     if (!user) {
+//       return res.status(404).json({
+//         data: null,
+//         msg: 'User not found',
+//         error: true,
+//       });
+//     }
+
+//     return res.status(200).json({
+//       data: user.subscription,
+//       msg: 'Subscription details fetched successfully',
+//       error: false,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       data: null,
+//       msg: 'Server error while fetching subscription',
+//       error: true,
+//     });
+//   }
+// };
+
+
+
+export const createOrUpdateSubscription = async (req, res) => {
+  try {
+    const { userId, packageName,currentPeriodEnd } = req.body;
+
+    if (!userId || !packageName) {
+      return res.status(400).json({
+        data: null,
+        msg: 'userId and packageName are required',
+        error: true,
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        data: null,
+        msg: 'User not found',
+        error: true,
+      });
+    }
+
+
+
+    user.subscription = {
+      packageName,
+      status: 'active',
+      currentPeriodEnd,
+    };
+
+    await user.save();
+
+    return res.status(200).json({
+      data: user.subscription,
+      msg: 'Subscription updated successfully',
+      error: false,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      data: null,
+      msg: 'Server error while updating subscription',
+      error: true,
+    });
+  }
+};
