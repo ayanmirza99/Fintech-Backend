@@ -4,6 +4,7 @@ import userRouter from "./routes/user.routes.js";
 import fintecthRoutes from "./routes/fintechRoutes.js";
 import {rateLimiter} from './middlewares/rateLimiter.js';
 import {logger} from "./middlewares/logger.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 
 const app = express();
@@ -24,10 +25,11 @@ app.use(logger);
 
 app.use(rateLimiter);
 
-// routes declaration
 app.use("/api/v1/users", userRouter);
 
 app.use("/api/v1/fintech",fintecthRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 
 export { app };
