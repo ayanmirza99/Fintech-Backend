@@ -66,7 +66,7 @@ export const getTransactions = async (req, res) => {
 
   try {
     const transactions = await Transaction.find({
-      $or: [{ sender: req.userId }, { receiver: req.userId }],
+      $or: [{ sender: req.user._id }, { receiver: req.user._id }],
     })
       .sort({ timestamp: -1 })
       .skip(skip)
@@ -93,7 +93,7 @@ export const generateInvoice = async (req, res) => {
 
   try {
     const transactions = await Transaction.find({
-      $or: [{ sender: req.userId }, { receiver: req.userId }],
+      $or: [{ sender: req.user._id }, { receiver: req.user._id }],
       timestamp: { $gte: new Date(start), $lte: new Date(end) },
     });
 
