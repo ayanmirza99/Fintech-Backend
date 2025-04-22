@@ -30,6 +30,16 @@ const userSchema = new Schema(
       default: "DEVELOPER",
       required: true,
     },
+    balance: {
+      amount: {
+        type: Number,
+        default: 1000,
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now,
+      },
+    },
   
 
     subscription: {
