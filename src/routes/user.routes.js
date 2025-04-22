@@ -9,6 +9,6 @@ router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 
 
-router.get("/me", verifyJwt, getCurrentUser);
+router.get("/auth-me", verifyJwt, getCurrentUser);
 
 export default router;
