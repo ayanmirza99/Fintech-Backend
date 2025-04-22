@@ -4,7 +4,7 @@ import { Transaction } from '../models/Transaction.js';
 
 export const getBalance = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('balance');
+    const user = await User.findById(req.user._id).select('balance');
     if (!user) {
       return res.status(404).json({ data: null, msg: 'User not found', error: true });
     }
