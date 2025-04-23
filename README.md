@@ -50,8 +50,43 @@ JWT_SECRET=your_jwt_secret
 🧑‍💼 Authentication & User
 ```
 Method | Endpoint | Description | Auth Required
-POST | /api/register | Register a new user | ❌
-POST | /api/login | Login and receive JWT token | ❌
-GET | /api/auth-me | Get currently logged-in user | ✅
+POST | /api/v1/users/register | Register a new user | ❌
+POST | /api/v1/users/login | Login and receive JWT token | ❌
+GET | /api/v1/users/auth-me | Get currently logged-in user | ✅
+
+```
+
+💳 Subscription
+
+```
+Method	Endpoint	Description	Auth Required
+POST	/api/v1/users/subscription	Create subscription	✅
+
+
+
+```
+
+💰 Financial Operations
+```
+Method	Endpoint	Description	Auth Required
+
+GET	/api/v1/fintechbalance	Get current user balance	✅
+POST	/api/v1/fintechtransfer	Transfer funds to another account	✅
+GET	/api/v1/fintechtransactions	Get transaction history	✅
+GET	/api/v1/fintechinvoice	Generate and download invoice PDF	✅
+```
+
+
+🔐 Admin API Endpoints
+
+All admin routes are protected by verifyJwt and isAdmin middleware.
+
+```
+Method | Endpoint | Description
+GET | /api/v1/admin/users | Get all registered users.
+POST | /api/v1/admin/subscriptions/cancel | Cancel a user's subscription.
+GET | /api/v1/admin/logs | Retrieve system logs.
+GET | /api/v1/admin/recentSignUps | Get recently registered users.
+GET | /api/v1/admin/subscription-distribution | Get subscription plan analytics.
 
 ```
