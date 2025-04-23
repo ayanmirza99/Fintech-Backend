@@ -149,7 +149,6 @@ export const generateInvoice = async (req, res) => {
 
     const transactions = await Transaction.find({
       $or: [{ sender: userId }, { receiver: userId }],
-      timestamp: { $gte: startDate, $lte: endDate }
     });
 
     const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);
