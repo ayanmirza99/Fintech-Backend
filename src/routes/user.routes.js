@@ -6,6 +6,7 @@ import {
     transferFunds,
     getTransactions,
     generateInvoice,
+    getTransactionTrends,
   } from '../controllers/fintech.controller.js';
   
 const router = Router();
@@ -23,5 +24,6 @@ router.get('/balance', verifyJwt, getBalance);
 router.post('/transfer', verifyJwt, transferFunds);
 router.get('/transactions', verifyJwt, getTransactions);
 router.get('/invoice', verifyJwt, generateInvoice);
+router.get('/getTransactionTrends', verifyJwt, getTransactionTrends);
 
 export default router;

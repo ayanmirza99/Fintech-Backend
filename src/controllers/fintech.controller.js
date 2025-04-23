@@ -34,7 +34,6 @@ export const transferFunds = async (req, res) => {
     });
   }
 
-
   if (
     !mongoose.Types.ObjectId.isValid(sourceId) ||
     !mongoose.Types.ObjectId.isValid(destinationId)
@@ -165,6 +164,41 @@ export const generateInvoice = async (req, res) => {
   } catch (err) {
     console.log(err);
 
+    return res
+      .status(500)
+      .json({ data: null, message: "Server error", error: true });
+  }
+};
+
+export const getTransactionTrends = async (req, res) => {
+  try {
+    const days = 7; // last 7 days
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - days);
+
+    const transactions = await Transaction.find({
+      timestamp: { $gte: start, $lte: end },
+    });
+
+    const dailyTotals = {};
+
+    for (let tx of transactions) {
+      const day = tx.timestamp.toISOString().split("T")[0];
+      dailyTotals[day] = (dailyTotals[day] || 0) + tx.amount;
+    }
+
+    const chartData = Object.entries(dailyTotals).map(([date, amount]) => ({
+      date,
+      amount,
+    }));
+
+    return res.status(200).json({
+      data: chartData,
+      message: "Transaction trends fetched",
+      error: false,
+    });
+  } catch (err) {
     return res
       .status(500)
       .json({ data: null, message: "Server error", error: true });
