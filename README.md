@@ -1,4 +1,5 @@
-🚀 Stripe Subscription Backend (Express.js)
+**🚀 Stripe Subscription Backend (Express.js)**
+
 This backend repo enables subscription-based payments using Stripe Checkout Sessions. It securely integrates Stripe with JWT-based authentication and provides an API endpoint for creating subscription sessions.
 
 project-root/
@@ -43,5 +44,14 @@ JWT_SECRET=your_jwt_secret
 4. Run the Server
 
     npm run dev
+
+📡 API Endpoints
+
+🧑‍💼 Authentication & User
+
+Method | Endpoint | Description | Auth Required
+POST | /api/register | Register a new user | ❌
+POST | /api/login | Login and receive JWT token | ❌
+GET | /api/auth-me | Get currently logged-in user | ✅
 
 
