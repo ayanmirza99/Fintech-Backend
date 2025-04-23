@@ -29,7 +29,7 @@ app.use("/api/v1/users", userRouter);
 
 app.use("/api/v1/fintech",fintecthRoutes);
 
-app.use("/api/admin", adminRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 
 export { app };

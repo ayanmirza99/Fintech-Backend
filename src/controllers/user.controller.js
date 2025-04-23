@@ -1,6 +1,4 @@
 import { User } from "../models/user.model.js";
-import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const generateAccessAndRefreshTokens = async (user) => {
@@ -8,10 +6,10 @@ const generateAccessAndRefreshTokens = async (user) => {
     const accessToken = user.generateToken(user._id);
     return { accessToken };
   } catch (error) {
-    throw new ApiError(
-      500,
-      "Something went wrong while generating access token"
-    );
+    throw {
+      statusCode: 500,
+      message: "Something went wrong while generating access token",
+    };
   }
 };
 
@@ -23,14 +21,24 @@ export const registerUser = asyncHandler(async (req, res) => {
       (field) => field?.trim() === ""
     )
   ) {
-    throw new ApiError(400, "All fields are required");
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "All fields are required",
+      data: null,
+    });
   }
 
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (existedUser) {
-    throw new ApiError(409, "User with this email or username already exists");
+    return res.status(409).json({
+      status: 409,
+      success: false,
+      message: "User with this email or username already exists",
+      data: null,
+    });
   }
 
   const user = await User.create({
@@ -38,32 +46,39 @@ export const registerUser = asyncHandler(async (req, res) => {
     email,
     username,
     password,
-    role
+    role,
   });
 
-const createdUser = await User.findById(user._id).select("-password");
-if (!createdUser) {
-  throw new ApiError(500, "Something went wrong while registering the user");
-}
+  const createdUser = await User.findById(user._id).select("-password");
+  if (!createdUser) {
+    return res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Something went wrong while registering the user",
+      data: null,
+    });
+  }
 
-return res
-  .status(201)
-  .json(
-    new ApiResponse(
-      200,
-      createdUser,
-      `${user.role === "ADMIN" ? "Admin" : "Developer"
-      } registered successfully`
-    )
-  );
+  return res.status(201).json({
+    status: 201,
+    success: true,
+    message: `${
+      user.role === "ADMIN" ? "Admin" : "Developer"
+    } registered successfully`,
+    data: createdUser,
+  });
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-
   const { email, username, password } = req.body;
 
   if (!username && !email) {
-    throw new ApiError(400, "Username or email is required");
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "Username or email is required",
+      data: null,
+    });
   }
 
   const user = await User.findOne({
@@ -71,76 +86,60 @@ export const loginUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError(404, "User does not exist");
+    return res.status(404).json({
+      status: 404,
+      success: false,
+      message: "User does not exist",
+      data: null,
+    });
   }
 
   const isValidPassword = await user.isPasswordCorrect(password);
 
   if (!isValidPassword) {
-    throw new ApiError(401, "Invalid user credentials");
+    return res.status(401).json({
+      status: 401,
+      success: false,
+      message: "Invalid user credentials",
+      data: null,
+    });
   }
 
   const { accessToken } = await generateAccessAndRefreshTokens(user);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        ...(({ password, ...rest }) => rest)(user._doc),
-        accessToken,
-      },
-      "Login succesfull"
-    )
-  );
-});
+  // Remove password from user object
+  const { password: _, ...userWithoutPassword } = user._doc;
 
+  return res.status(200).json({
+    status: 200,
+    success: true,
+    message: "Login successful",
+    data: {
+      user: userWithoutPassword,
+      accessToken,
+    },
+  });
+});
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+  return res.status(200).json({
+    status: 200,
+    success: true,
+    message: "User fetched successfully",
+    data: req.user,
+  });
 });
 
-
-
-
-// export const getSubscriptionDetails = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.userId).select('subscription');
-
-//     if (!user) {
-//       return res.status(404).json({
-//         data: null,
-//         msg: 'User not found',
-//         error: true,
-//       });
-//     }
-
-//     return res.status(200).json({
-//       data: user.subscription,
-//       msg: 'Subscription details fetched successfully',
-//       error: false,
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       data: null,
-//       msg: 'Server error while fetching subscription',
-//       error: true,
-//     });
-//   }
-// };
-
-
-
-export const createOrUpdateSubscription = async (req, res) => {
+export const createOrUpdateSubscription = asyncHandler(async (req, res) => {
   try {
-    const { userId, packageName,currentPeriodEnd } = req.body;
+    const { userId, packageName, currentPeriodEnd } = req.body;
 
     if (!userId || !packageName) {
       return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "userId and packageName are required",
         data: null,
-        msg: 'userId and packageName are required',
-        error: true,
       });
     }
 
@@ -148,33 +147,34 @@ export const createOrUpdateSubscription = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "User not found",
         data: null,
-        msg: 'User not found',
-        error: true,
       });
     }
 
-
-
     user.subscription = {
       packageName,
-      status: 'active',
+      status: "active",
       currentPeriodEnd,
     };
 
     await user.save();
 
     return res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Subscription updated successfully",
       data: user.subscription,
-      msg: 'Subscription updated successfully',
-      error: false,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Server error while updating subscription",
       data: null,
-      msg: 'Server error while updating subscription',
-      error: true,
     });
   }
-};
+});

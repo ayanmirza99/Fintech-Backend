@@ -6,7 +6,7 @@ import {
     transferFunds,
     getTransactions,
     generateInvoice,
-  } from '../controllers/fintechController.js';
+  } from '../controllers/fintech.controller.js';
   
 const router = Router();
 
