@@ -34,7 +34,7 @@ export const transferFunds = async (req, res) => {
     });
   }
 
-  // Validate ObjectId format
+
   if (
     !mongoose.Types.ObjectId.isValid(sourceId) ||
     !mongoose.Types.ObjectId.isValid(destinationId)
@@ -149,7 +149,7 @@ export const generateInvoice = async (req, res) => {
 
     const transactions = await Transaction.find({
       $or: [{ sender: userId }, { receiver: userId }],
-      // timestamp: { $gte: endDate, $lte: startDate },
+      timestamp: { $gte: startDate, $lte: endDate }
     });
 
     const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);

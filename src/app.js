@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import userRouter from "./routes/user.routes.js";
 import fintecthRoutes from "./routes/fintechRoutes.js";
-import {rateLimiter} from './middlewares/rateLimiter.js';
 import {logger} from "./middlewares/logger.js";
 import adminRoutes from "./routes/admin.routes.js";
 
@@ -23,7 +22,6 @@ app.use(express.static("public"));
 app.use(logger);
 
 
-app.use(rateLimiter);
 
 app.use("/api/v1/users", userRouter);
 
